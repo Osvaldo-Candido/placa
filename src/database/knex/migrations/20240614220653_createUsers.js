@@ -15,6 +15,7 @@ exports.up = (knex) =>
     table.string('location', 255).notNullable();
     table.string('business_hours', 255).notNullable();
     table.string('email', 255);
+    table.string('password', 255);
     table.string('phone', 20);
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
