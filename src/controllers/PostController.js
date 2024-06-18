@@ -47,20 +47,69 @@ class PostController {
       throw new AppError('Erro ao fazer o post');
     }
   }
+  async update(request, response) {
+    const { id } = request.params;
+    const {
+      user_id,
+      category,
+      name,
+      price,
+      current_price,
+      description,
+      speciality,
+    } = request.body;
+
+    try {
+      await database('posts').where({ id }).update({
+        user_id,
+        category,
+        name,
+        price,
+        current_price,
+        description,
+        speciality,
+        updated_at: new Date(),
+      });
+
+      return response
+        .status(200)
+        .json({ message: 'Post atualizado com sucesso' });
+    } catch (error) {
+      throw new AppError('Erro ao atualizar o post');
+    }
+  }
 
   async show(request, response) {
     const id = request.params;
 
     try {
-      const post = await database('posts').where({ id });
-      return response.json({ post });
+      const post = await database('posts').where(id);
+      return response.json(post);
     } catch {
       throw new AppError('Não foi possível carregar o produto');
     }
-    return response.json(id);
   }
 
-  async delete() {}
+  async delete(request, response) {
+    const { id } = request.params;
+
+    try {
+      const post = await database('posts').where({ id }).first();
+      if (!post) {
+        return response.status(404).json({ message: 'Post não encontrado' });
+      }
+
+      await database('imagesPosts').where({ id_post: id }).del();
+
+      await database('posts').where({ id }).del();
+
+      return response
+        .status(200)
+        .json({ message: 'Post deletado com sucesso' });
+    } catch (error) {
+      throw new AppError('Erro ao deletar o post');
+    }
+  }
 }
 
 module.exports = PostController;
